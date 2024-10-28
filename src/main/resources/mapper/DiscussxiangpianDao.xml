@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.DiscussxiangpianDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.addtime as addtime
+        ,a.refid as refid
+        ,a.userid as userid
+        ,a.content as content
+        ,a.reply as reply
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.DiscussxiangpianView" >
+        SELECT
+        <include refid="Base_Column_List" />,b.xpname,c.name as yhname
+
+--         级联表的字段
+
+        FROM discussxiangpian  a left join xiangpian b on a.refid = b.id left join yonghu c on a.userid = c.id
+
+        <where>
+            <if test=" params.addtimeStart != '' and params.addtimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.addtime, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.addtimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.addtimeEnd != '' and params.addtimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.addtime, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.addtimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.yonghuId != '' and params.yonghuId != null">
+                and a.userid = #{params.yonghuId}
+            </if>
+            <if test=" params.reply != '' and params.reply != null and params.reply != 'null' ">
+                and a.reply like CONCAT('%',#{params.reply},'%')
+            </if>
+
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XiangpianDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.xiangche_id as xiangcheId
+        ,a.xpname as xpname
+        ,a.paishedidian as paishedidian
+        ,a.xpimg_photo as xpimgPhoto
+        ,a.paisheren as paisheren
+        ,a.xpsize as xpsize
+        ,a.fenlei_types as fenleiTypes
+        ,a.xiangpian_content as xiangpianContent
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XiangpianView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,xiangche.odd as odd
+        ,xiangche.xcname as xcname
+        ,xiangche.img_photo as imgPhoto
+        ,xiangche.yonghu_id as yonghuId
+        ,xiangche.number as number
+        ,xiangche.chuanjian_time as chuanjianTime
+        ,xiangche.xiangche_content as xiangcheContent
+
+        FROM xiangpian  a
+        left JOIN xiangche xiangche ON a.xiangche_id = xiangche.id
+
+        <where>
+            <if test="params.xiangcheId != null">
+                and a.xiangche_id = #{params.xiangcheId}
+            </if>
+            <if test=" params.xpname != '' and params.xpname != null and params.xpname != 'null' ">
+                and a.xpname like CONCAT('%',#{params.xpname},'%')
+            </if>
+            <if test=" params.paishedidian != '' and params.paishedidian != null and params.paishedidian != 'null' ">
+                and a.paishedidian like CONCAT('%',#{params.paishedidian},'%')
+            </if>
+            <if test=" params.paisheren != '' and params.paisheren != null and params.paisheren != 'null' ">
+                and a.paisheren like CONCAT('%',#{params.paisheren},'%')
+            </if>
+            <if test=" params.xpsizeStart != '' and params.xpsizeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.xpsize, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.xpsizeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.xpsizeEnd != '' and params.xpsizeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.xpsize, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.xpsizeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test="params.fenleiTypes != null">
+                and a.fenlei_types = #{params.fenleiTypes}
+            </if>
+            <if test=" params.xiangpianContent != '' and params.xiangpianContent != null and params.xiangpianContent != 'null' ">
+                and a.xiangpian_content like CONCAT('%',#{params.xiangpianContent},'%')
+            </if>
+
+            <if test=" params.odd != '' and params.odd != null and params.odd != 'null' ">
+                and xiangche.odd like CONCAT('%',#{params.odd},'%')
+            </if>
+            <if test=" params.xcname != '' and params.xcname != null and params.xcname != 'null' ">
+                and xiangche.xcname like CONCAT('%',#{params.xcname},'%')
+            </if>
+            <if test="params.yonghuId != null">
+                and xiangche.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.numberStart != null ">
+                <![CDATA[  and xiangche.number >= #{params.numberStart}   ]]>
+            </if>
+            <if test="params.numberEnd != null ">
+                <![CDATA[  and xiangche.number <= #{params.numberEnd}   ]]>
+            </if>
+            <if test=" params.chuanjianTimeStart != '' and params.chuanjianTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(xiangche.chuanjian_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.chuanjianTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.chuanjianTimeEnd != '' and params.chuanjianTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(xiangche.chuanjian_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.chuanjianTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.xiangcheContent != '' and params.xiangcheContent != null and params.xiangcheContent != 'null' ">
+                and xiangche.xiangche_content like CONCAT('%',#{params.xiangcheContent},'%')
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>

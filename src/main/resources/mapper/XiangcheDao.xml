@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XiangcheDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.odd as odd
+        ,a.xcname as xcname
+        ,a.img_photo as imgPhoto
+        ,a.yonghu_id as yonghuId
+        ,a.number as number
+        ,a.chuanjian_time as chuanjianTime
+        ,a.xiangche_content as xiangcheContent
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XiangcheView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.name as name
+        ,yonghu.username as username
+        ,yonghu.password as password
+        ,yonghu.yhimg_photo as yhimgPhoto
+        ,yonghu.sex_types as sexTypes
+        ,yonghu.phone as phone
+        ,yonghu.id_number as idNumber
+        ,yonghu.role as role
+
+        FROM xiangche  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test=" params.odd != '' and params.odd != null and params.odd != 'null' ">
+                and a.odd like CONCAT('%',#{params.odd},'%')
+            </if>
+            <if test=" params.xcname != '' and params.xcname != null and params.xcname != 'null' ">
+                and a.xcname like CONCAT('%',#{params.xcname},'%')
+            </if>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.numberStart != null">
+                <![CDATA[  and a.number >= #{params.numberStart}   ]]>
+            </if>
+            <if test="params.numberEnd != null">
+                <![CDATA[  and a.number <= #{params.numberEnd}   ]]>
+            </if>
+            <if test=" params.chuanjianTimeStart != '' and params.chuanjianTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.chuanjian_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.chuanjianTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.chuanjianTimeEnd != '' and params.chuanjianTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.chuanjian_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.chuanjianTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.xiangcheContent != '' and params.xiangcheContent != null and params.xiangcheContent != 'null' ">
+                and a.xiangche_content like CONCAT('%',#{params.xiangcheContent},'%')
+            </if>
+
+            <if test=" params.name != '' and params.name != null and params.name != 'null' ">
+                and yonghu.name like CONCAT('%',#{params.name},'%')
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and yonghu.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and yonghu.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.phone != '' and params.phone != null and params.phone != 'null' ">
+                and yonghu.phone like CONCAT('%',#{params.phone},'%')
+            </if>
+            <if test=" params.idNumber != '' and params.idNumber != null and params.idNumber != 'null' ">
+                and yonghu.id_number like CONCAT('%',#{params.idNumber},'%')
+            </if>
+            <if test=" params.role != '' and params.role != null and params.role != 'null' ">
+                and yonghu.role like CONCAT('%',#{params.role},'%')
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>
